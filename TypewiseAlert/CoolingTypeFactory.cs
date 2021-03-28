@@ -25,22 +25,19 @@ namespace TypewiseAlert
         
         private Type FindInstanceInExecutingAssembly(string sourceName)
         {
-            Type[] typesInThisAssembly = Assembly.GetExecutingAssembly().GetTypes();
-            foreach (Type type in typesInThisAssembly)
-            {
-                if (type.GetInterface(typeof(ICoolingType).ToString()) != null)
-                {
-                    if (type.Name.Contains(sourceName))
-                    {
-                        return type;
-                    }
-                }
-            }
-            return null;
+            AssemblyName[] assemblyNames = new AssemblyName[1];
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+            assemblyNames[0] = assemblyName;
+            return CheckTypeInAssembly(assemblyNames, sourceName);
         }
         private Type FindInstanceInReferencedAssemblies(string sourceName)
         {
-            foreach (var assemblyName in Assembly.GetExecutingAssembly().GetReferencedAssemblies())
+            AssemblyName[] assemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
+            return CheckTypeInAssembly(assemblyNames, sourceName);
+        }
+        private Type CheckTypeInAssembly(AssemblyName[] assemblyNames, string sourceName)
+        {
+            foreach (var assemblyName in assemblyNames)
             {
                 Assembly assembly = Assembly.Load(assemblyName);
                 Type[] types = assembly.GetTypes();
@@ -48,7 +45,7 @@ namespace TypewiseAlert
                 {
                     if (type.GetInterface(typeof(ICoolingType).ToString()) != null)
                     {
-                        if (type.Name.Contains(sourceName))
+                        if (type.Name.ToUpper().Contains(sourceName))
                         {
                             return type;
                         }
