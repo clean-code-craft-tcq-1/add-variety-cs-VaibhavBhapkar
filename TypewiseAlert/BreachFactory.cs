@@ -9,7 +9,7 @@ namespace TypewiseAlert
     {
         public IBreachType GetInstanceOfBreachType(string source)
         {
-            Type typeAssembly = FindAssembly.FindInstanceOfAssembly(source,typeof(IBreachType).ToString());
+            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IBreachType).ToString());
             if (typeAssembly == null) throw new Exception("Bad Type");
             else return Activator.CreateInstance(typeAssembly) as IBreachType;
         }

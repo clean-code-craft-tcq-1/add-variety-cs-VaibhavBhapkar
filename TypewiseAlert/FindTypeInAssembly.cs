@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public static class FindAssembly
+    public static class FindTypeInAssembly
     {
         public static Type FindInstanceOfAssembly(string sourceName, string typeName)
         {

@@ -9,7 +9,7 @@ namespace TypewiseAlert
     {
         public IAlerter GetInstanceOfAlertType(string source)
         {
-            Type typeAssembly = FindAssembly.FindInstanceOfAssembly(source,typeof(IAlerter).ToString());
+            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IAlerter).ToString());
             if (typeAssembly == null) throw new Exception("Bad Type");
             else return Activator.CreateInstance(typeAssembly) as IAlerter;
         }
