@@ -6,41 +6,56 @@ using System.Text;
 namespace TypewiseAlert
 {
     public class CoolingTypeFactory
-    {
-        Dictionary<string, Type> coolingType;
-        public CoolingTypeFactory()
+    {       
+        public ICoolingType GetInstanceOfCoolingType(string source)
         {
-            LoadTypesAssemblyCanReturn();
-        }
-        public ICoolingType CreateInstance(string source)
-        {
-            Type typeAssembly = GetTypeToCreate(source);
+            Type typeAssembly = FindInstanceOfCoolingType(source);
             if (typeAssembly == null) throw new Exception("Bad Type");
             else return Activator.CreateInstance(typeAssembly) as ICoolingType;
-        }
-        private Type GetTypeToCreate(string sourceName)
+        }        
+        private Type FindInstanceOfCoolingType(string sourceName)
         {
-            foreach (var source in coolingType)
+            Type type = FindInstanceInExecutingAssembly(sourceName);
+            if(type==null)
             {
-                Console.WriteLine(source.Key);
-                if (source.Key.Contains(sourceName))
+                type = FindInstanceInReferencedAssemblies(sourceName);
+            }
+            return type;  
+        }
+        
+        private Type FindInstanceInExecutingAssembly(string sourceName)
+        {
+            Type[] typesInThisAssembly = Assembly.GetExecutingAssembly().GetTypes();
+            foreach (Type type in typesInThisAssembly)
+            {
+                if (type.GetInterface(typeof(ICoolingType).ToString()) != null)
                 {
-                    return coolingType[source.Key];
+                    if (type.Name.Contains(sourceName))
+                    {
+                        return type;
+                    }
                 }
             }
             return null;
         }
-        private void LoadTypesAssemblyCanReturn()
+        private Type FindInstanceInReferencedAssemblies(string sourceName)
         {
-            coolingType = new Dictionary<string, Type>();
-            Type[] typeInThisAssembly = Assembly.GetExecutingAssembly().GetTypes();
-            foreach (Type type in typeInThisAssembly)
+            foreach (var assemblyName in Assembly.GetExecutingAssembly().GetReferencedAssemblies())
             {
-                if (type.GetInterface(typeof(ICoolingType).ToString()) != null)
+                Assembly assembly = Assembly.Load(assemblyName);
+                Type[] types = assembly.GetTypes();
+                foreach (var type in types)
                 {
-                    coolingType.Add(type.Name.ToUpper(), type);
+                    if (type.GetInterface(typeof(ICoolingType).ToString()) != null)
+                    {
+                        if (type.Name.Contains(sourceName))
+                        {
+                            return type;
+                        }
+                    }
                 }
             }
+            return null;
         }
     }
 }

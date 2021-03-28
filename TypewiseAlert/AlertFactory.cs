@@ -7,40 +7,55 @@ namespace TypewiseAlert
 {
     public class AlertFactory
     {
-        Dictionary<string, Type> alertMode;
-        public AlertFactory()
+        public IAlerter GetInstanceOfAlertType(string source)
         {
-            LoadTypesAssemblyCanReturn();
-        }
-        public IAlerter CreateInstance(string source)
-        {
-            Type typeAssembly = GetTypeToCreate(source);
+            Type typeAssembly = FindInstanceOfAlertType(source);
             if (typeAssembly == null) throw new Exception("Bad Type");
             else return Activator.CreateInstance(typeAssembly) as IAlerter;
         }
-        private Type GetTypeToCreate(string sourceName)
+        private Type FindInstanceOfAlertType(string sourceName)
         {
-            foreach (var source in alertMode)
+            Type type = FindInstanceInExecutingAssembly(sourceName);
+            if (type == null)
             {
-                Console.WriteLine(source.Key);
-                if (source.Key.Contains(sourceName))
+                type = FindInstanceInReferencedAssemblies(sourceName);
+            }
+            return type;
+        }
+
+        private Type FindInstanceInExecutingAssembly(string sourceName)
+        {
+            Type[] typesInThisAssembly = Assembly.GetExecutingAssembly().GetTypes();
+            foreach (Type type in typesInThisAssembly)
+            {
+                if (type.GetInterface(typeof(IAlerter).ToString()) != null)
                 {
-                    return alertMode[source.Key];
+                    if (type.Name.ToUpper().Contains(sourceName))
+                    {
+                        return type;
+                    }
                 }
             }
             return null;
         }
-        private void LoadTypesAssemblyCanReturn()
+        private Type FindInstanceInReferencedAssemblies(string sourceName)
         {
-            alertMode = new Dictionary<string, Type>();
-            Type[] typeInThisAssembly = Assembly.GetExecutingAssembly().GetTypes();
-            foreach (Type type in typeInThisAssembly)
+            foreach (var assemblyName in Assembly.GetExecutingAssembly().GetReferencedAssemblies())
             {
-                if (type.GetInterface(typeof(IAlerter).ToString()) != null)
+                Assembly assembly = Assembly.Load(assemblyName);
+                Type[] types = assembly.GetTypes();
+                foreach (var type in types)
                 {
-                    alertMode.Add(type.Name.ToUpper(), type);
+                    if (type.GetInterface(typeof(IAlerter).ToString()) != null)
+                    {
+                        if (type.Name.ToUpper().Contains(sourceName))
+                        {
+                            return type;
+                        }
+                    }
                 }
             }
+            return null;
         }
     }
 }

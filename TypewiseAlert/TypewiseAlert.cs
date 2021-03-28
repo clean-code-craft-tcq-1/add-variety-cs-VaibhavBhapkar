@@ -20,7 +20,7 @@ namespace TypewiseAlert
         public static AlertConstants.BreachType ClassifyTemperatureBreach(AlertConstants.CoolingType coolingType, double temperatureInC)
         {
             CoolingTypeFactory factory = new CoolingTypeFactory();
-            ICoolingType coolingTypeInstance = factory.CreateInstance(coolingType.ToString());
+            ICoolingType coolingTypeInstance = factory.GetInstanceOfCoolingType(coolingType.ToString());
             return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
         }
               
@@ -29,7 +29,7 @@ namespace TypewiseAlert
             AlertConstants.BreachType breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
             AlertFactory alertFactory = new AlertFactory();
             string alertType = alertTarget.ToString().Split('_')[1].ToString().ToUpper();
-            IAlerter ialertDetails = alertFactory.CreateInstance(alertType);
+            IAlerter ialertDetails = alertFactory.GetInstanceOfAlertType(alertType);
             return ialertDetails.GenerateAlert(breachType);
         }
        
