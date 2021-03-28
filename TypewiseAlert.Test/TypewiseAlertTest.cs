@@ -13,16 +13,35 @@ namespace TypewiseAlert.Test
               AlertConstants.BreachType.TOO_LOW);
         }
         [Fact]
-        public void ClassifyTemperatureBreachLimit()
+        public void ClassifyTemperatureBreachLimitMediun()
         {
             Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.MED_ACTIVE_COOLING, 42) ==
               AlertConstants.BreachType.TOO_HIGH);
         }
         [Fact]
-        public void CheckAlertType()
+        public void ClassifyTemperatureBreachLimitHigh()
+        {
+            Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.HI_ACTIVE_COOLING, 42) ==
+              AlertConstants.BreachType.NORMAL);
+        }
+        [Fact]
+        public void ClassifyTemperatureBreachLimitLow()
+        {
+            Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.PASSIVE_COOLING, -1) ==
+              AlertConstants.BreachType.TOO_LOW);
+        }
+        [Fact]
+        public void CheckAlertTypeEmail()
         {
             BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
             Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_EMAIL, batteryCharacter, 42) ==
+              true);
+        }
+        [Fact]
+        public void CheckAlertTypeController()
+        {
+            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
+            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONTROLLER, batteryCharacter, 42) ==
               true);
         }
     }
