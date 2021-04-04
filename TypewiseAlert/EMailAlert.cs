@@ -6,14 +6,19 @@ namespace TypewiseAlert
 {
     public class EMailAlert : IAlerter
     {
-        public bool GenerateAlert(AlertConstants.BreachType breachType)
+        public bool isGenerateAlertCalledOnce { get; set; }
+        public EMailAlert()
         {
+            this.isGenerateAlertCalledOnce = false;
+        }
+        public void GenerateAlert(AlertConstants.BreachType breachType)
+        {
+            this.isGenerateAlertCalledOnce = true;
             string recepient = "abc@com";
             BreachFactory breachFactory = new BreachFactory();
             string breachLevel = breachType.ToString().Split('_')[1].ToString().ToUpper();
             IBreachType iBreachDetails = breachFactory.GetInstanceOfBreachType(breachLevel);
             iBreachDetails.Display(recepient);
-            return true;
         }
     }
 }

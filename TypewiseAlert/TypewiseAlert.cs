@@ -30,7 +30,8 @@ namespace TypewiseAlert
             AlertFactory alertFactory = new AlertFactory();
             string alertType = alertTarget.ToString().Split('_')[1].ToString().ToUpper();
             IAlerter ialertDetails = alertFactory.GetInstanceOfAlertType(alertType);
-            return ialertDetails.GenerateAlert(breachType);
+            ialertDetails.GenerateAlert(breachType);
+            return ialertDetails.isGenerateAlertCalledOnce;
         }
        
 

@@ -7,7 +7,7 @@ namespace TypewiseAlert.Test
     public class TypewiseAlertTest
     {
         [Fact]
-        public void InfersBreachAsPerLimits()
+        public void InferBreachAsPerLowLimits()
         {
             Assert.True(TypewiseAlert.InferBreach(12, 20, 30) ==
               AlertConstants.BreachType.TOO_LOW);
@@ -29,20 +29,24 @@ namespace TypewiseAlert.Test
         {
             Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.PASSIVE_COOLING, -1) ==
               AlertConstants.BreachType.TOO_LOW);
-        }
+        }       
         [Fact]
-        public void CheckAlertTypeEmail()
+        public void CheckAlertTypeConsole()
         {
-            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
-            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_EMAIL, batteryCharacter, 42) ==
-              true);
+            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");            
+            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONSOLE, batteryCharacter, 42));
         }
         [Fact]
         public void CheckAlertTypeController()
         {
             BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
-            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONTROLLER, batteryCharacter, 42) ==
-              true);
+            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONTROLLER, batteryCharacter, 42));
+        }
+        [Fact]
+        public void CheckAlertTypeEmail()
+        {
+            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
+            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_EMAIL, batteryCharacter, 42));
         }
     }
 }

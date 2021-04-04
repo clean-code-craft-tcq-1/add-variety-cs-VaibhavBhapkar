@@ -6,6 +6,7 @@ namespace TypewiseAlert
 {
     public interface IAlerter
     {
-        bool GenerateAlert(AlertConstants.BreachType breachType);
+        bool isGenerateAlertCalledOnce { get; set; }
+        void GenerateAlert(AlertConstants.BreachType breachType);
     }
 }

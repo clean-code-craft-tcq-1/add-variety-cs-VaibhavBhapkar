@@ -21,7 +21,8 @@ namespace TypewiseAlert
         public enum AlertTarget
         {
             TO_CONTROLLER,
-            TO_EMAIL
+            TO_EMAIL,
+            TO_CONSOLE
         };
         public struct BatteryCharacter
         {
