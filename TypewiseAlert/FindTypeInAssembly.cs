@@ -48,6 +48,26 @@ namespace TypewiseAlert
             }
             return null;
         }
+        public static List<object> GetInstanceFromInterface(string typeName)
+        {
+            AssemblyName[] assemblyNames = new AssemblyName[1];
+            AssemblyName executingAssemblyName = Assembly.GetExecutingAssembly().GetName();
+            assemblyNames[0] = executingAssemblyName;
+            List<object> instanceList = new List<object>();
+            foreach (var assemblyName in assemblyNames)
+            {
+                Assembly assembly = Assembly.Load(assemblyName);
+                Type[] types = assembly.GetTypes();
+                foreach (var type in types)
+                {
+                    if (type.GetInterface(typeName) != null)
+                    {
+                        instanceList.Add(Activator.CreateInstance(type));
+                    }
+                }
+            }
+            return instanceList;
+        }
 
     }
 }

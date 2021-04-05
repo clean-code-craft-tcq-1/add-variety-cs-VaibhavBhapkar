@@ -13,6 +13,18 @@ namespace TypewiseAlert.Test
               AlertConstants.BreachType.TOO_LOW);
         }
         [Fact]
+        public void InferBreachAsPerHighLimits()
+        {
+            Assert.True(TypewiseAlert.InferBreach(35, 20, 30) ==
+              AlertConstants.BreachType.TOO_HIGH);
+        }
+        [Fact]
+        public void InferBreachAsPerNormal()
+        {
+            Assert.True(TypewiseAlert.InferBreach(25, 20, 30) ==
+              AlertConstants.BreachType.NORMAL);
+        }
+        [Fact]
         public void ClassifyTemperatureBreachLimitMediun()
         {
             Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.MED_ACTIVE_COOLING, 42) ==

@@ -17,7 +17,7 @@ namespace TypewiseAlert
             string recepient = "abc@com";
             BreachFactory breachFactory = new BreachFactory();
             string breachLevel = breachType.ToString().Split('_')[1].ToString().ToUpper();
-            IBreachType iBreachDetails = breachFactory.GetInstanceOfBreachType(breachLevel);
+            IBreachNotifier iBreachDetails = breachFactory.GetInstanceOfBreachNotifier(breachLevel);
             iBreachDetails.Display(recepient);
         }
     }

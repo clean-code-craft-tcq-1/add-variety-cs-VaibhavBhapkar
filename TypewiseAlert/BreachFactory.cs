@@ -7,12 +7,16 @@ namespace TypewiseAlert
 {
     public class BreachFactory
     {
-        public IBreachType GetInstanceOfBreachType(string source)
+        public IBreachNotifier GetInstanceOfBreachNotifier(string source)
         {
-            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IBreachType).ToString());
+            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IBreachNotifier).ToString());
             if (typeAssembly == null) throw new Exception("Bad Type");
-            else return Activator.CreateInstance(typeAssembly) as IBreachType;
+            else return Activator.CreateInstance(typeAssembly) as IBreachNotifier;
         }
-        
+
+        public List<Object> GetInstanceListOfBreachType()
+        {
+            return FindTypeInAssembly.GetInstanceFromInterface(typeof(IBreachType).ToString());
+        }
     }
 }

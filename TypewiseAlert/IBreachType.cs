@@ -6,6 +6,6 @@ namespace TypewiseAlert
 {
     public interface IBreachType
     {
-        void Display(string recepient);
+        AlertConstants.BreachType BreachValue(double value,double limitValue);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TypewiseAlert
 {
@@ -6,15 +7,31 @@ namespace TypewiseAlert
     {        
         public static AlertConstants.BreachType InferBreach(double value, double lowerLimit, double upperLimit)
         {
-            if (value < lowerLimit)
+            string breachTypeObjectName = string.Empty;
+            double limitValue = 0;
+            AlertConstants.BreachType result = AlertConstants.BreachType.NORMAL;
+            List<Object> breachTypeObjects = new List<object>();
+            List<AlertConstants.BreachType> breachTypes = new List<AlertConstants.BreachType>();
+            Dictionary<string, double> limitsAsPerBreachType = new Dictionary<string, double>();
+            limitsAsPerBreachType.Add("HighBreachType", upperLimit);
+            limitsAsPerBreachType.Add("LowBreachType", lowerLimit);
+            BreachFactory breachFactory = new BreachFactory();            
+            breachTypeObjects = breachFactory.GetInstanceListOfBreachType();
+            foreach (Object typeObject in breachTypeObjects)
             {
-                return AlertConstants.BreachType.TOO_LOW;
+                breachTypeObjectName = typeObject.ToString();
+                foreach (KeyValuePair<string, double>  breachLimit in limitsAsPerBreachType)
+                {
+                    if (breachLimit.Key == breachTypeObjectName.Split('.')[1])
+                    {
+                        limitValue = breachLimit.Value;
+                        break;
+                    }
+                }
+                breachTypes.Add(new InferBreachParameter((IBreachType)typeObject).BreachLimit(value,limitValue));
             }
-            if (value > upperLimit)
-            {
-                return AlertConstants.BreachType.TOO_HIGH;
-            }
-            return AlertConstants.BreachType.NORMAL;
+            result = breachTypes.Find(x => x != AlertConstants.BreachType.NORMAL);
+            return result;
         }
         
         public static AlertConstants.BreachType ClassifyTemperatureBreach(AlertConstants.CoolingType coolingType, double temperatureInC)

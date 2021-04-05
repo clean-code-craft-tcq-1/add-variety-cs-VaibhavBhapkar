@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public class LowBreach : IBreachType
+    public class LowBreach : IBreachNotifier
     {
         public void Display(string recepient)
         {
