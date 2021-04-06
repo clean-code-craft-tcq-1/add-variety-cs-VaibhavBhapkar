@@ -41,14 +41,13 @@ namespace TypewiseAlert
             return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
         }
               
-        public static bool CheckParameterAndAlert(AlertConstants.AlertTarget alertTarget, AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
+        public static void CheckParameterAndAlert(AlertConstants.AlertTarget alertTarget, AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
         {
             AlertConstants.BreachType breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
             AlertFactory alertFactory = new AlertFactory();
             string alertType = alertTarget.ToString().Split('_')[1].ToString().ToUpper();
             IAlerter ialertDetails = alertFactory.GetInstanceOfAlertType(alertType);
             ialertDetails.GenerateAlert(breachType);
-            return ialertDetails.isGenerateAlertCalledOnce;
         }
        
 

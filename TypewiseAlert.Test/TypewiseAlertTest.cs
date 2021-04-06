@@ -45,20 +45,19 @@ namespace TypewiseAlert.Test
         [Fact]
         public void CheckAlertTypeConsole()
         {
-            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");            
-            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONSOLE, batteryCharacter, 42));
-        }
-        [Fact]
-        public void CheckAlertTypeController()
-        {
             BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
-            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONTROLLER, batteryCharacter, 42));
+            var exception = Record.Exception(() => TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONSOLE, batteryCharacter, 42));
+            Assert.Null(exception);
         }
+        
         [Fact]
-        public void CheckAlertTypeEmail()
+        public void CheckFakeAlert()
         {
-            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
-            Assert.True(TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_EMAIL, batteryCharacter, 42));
+            FakeAlert fakeAlert = new FakeAlert();
+            IAlerter generateTrigger = fakeAlert;
+            generateTrigger.GenerateAlert(AlertConstants.BreachType.TOO_HIGH);
+            IFakeAlertChecker fakeAlertChecker = fakeAlert;
+            Assert.True(fakeAlertChecker.IsAlertTriggered());
         }
     }
 }
