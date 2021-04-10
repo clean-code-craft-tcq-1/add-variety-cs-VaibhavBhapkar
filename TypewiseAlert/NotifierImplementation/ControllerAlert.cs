@@ -6,7 +6,7 @@ namespace TypewiseAlert
 {
     public class ControllerAlert : IAlerter
     {
-        public void GenerateAlert(AlertConstants.BreachType breachType)
+        public void GenerateAlert(string breachType)
         {
             const ushort header = 0xfeed;
             Console.WriteLine("{0} : {1}\n", header, breachType);

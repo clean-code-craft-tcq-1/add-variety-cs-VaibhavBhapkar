@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public class HI_ACTIVE_COOLING : ICoolingType
+    public class HighCooling : ICoolingType
     {
         public int lowerLimit => 0;
 

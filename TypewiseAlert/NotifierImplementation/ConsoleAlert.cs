@@ -6,7 +6,7 @@ namespace TypewiseAlert
 {
     public class ConsoleAlert:IAlerter
     {        
-        public void GenerateAlert(AlertConstants.BreachType breachType)
+        public void GenerateAlert(string breachType)
         {
             Console.WriteLine("Breach Type is - {0}\n", breachType);
         }

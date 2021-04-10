@@ -6,15 +6,15 @@ namespace TypewiseAlert
 {
     public class HighBreachType : IBreachType
     {
-        public AlertConstants.BreachType BreachValue(double value,double limitValue)
+        public string BreachValue(double value,double limitValue)
         {
             if (value > limitValue)
             {
-                return AlertConstants.BreachType.TOO_HIGH;
+                return "High";
             }
             else
             {
-                return AlertConstants.BreachType.NORMAL;
+                return "Normal";
             }
         }
     }

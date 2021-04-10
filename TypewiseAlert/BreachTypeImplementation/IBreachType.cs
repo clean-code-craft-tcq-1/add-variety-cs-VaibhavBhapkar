@@ -4,8 +4,8 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public interface IFakeAlertChecker
+    public interface IBreachType
     {
-        bool IsAlertTriggered();
+        string BreachValue(double value,double limitValue);
     }
 }

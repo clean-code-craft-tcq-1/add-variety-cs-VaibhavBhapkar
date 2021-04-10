@@ -13,7 +13,7 @@ namespace TypewiseAlert
                 throw new ArgumentNullException("IBreachType cannot be null");
             this._breachType = breachType;
         }
-        public AlertConstants.BreachType BreachLimit(double value,double limitValue)
+        public string BreachLimit(double value,double limitValue)
         {
             return _breachType.BreachValue(value,limitValue);
         }

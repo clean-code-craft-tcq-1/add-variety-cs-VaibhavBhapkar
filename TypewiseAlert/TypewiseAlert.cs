@@ -5,22 +5,53 @@ namespace TypewiseAlert
 {
     public class TypewiseAlert
     {        
-        public static AlertConstants.BreachType InferBreach(double value, double lowerLimit, double upperLimit)
+        public static string InferBreach(double value, double lowerLimit, double upperLimit)
         {
-            string breachTypeObjectName = string.Empty;
-            double limitValue = 0;
-            AlertConstants.BreachType result = AlertConstants.BreachType.NORMAL;
-            List<Object> breachTypeObjects = new List<object>();
-            List<AlertConstants.BreachType> breachTypes = new List<AlertConstants.BreachType>();
+            
+            string result = "Normal";            
+            List<string> breachTypes = new List<string>();
             Dictionary<string, double> limitsAsPerBreachType = new Dictionary<string, double>();
             limitsAsPerBreachType.Add("HighBreachType", upperLimit);
             limitsAsPerBreachType.Add("LowBreachType", lowerLimit);
-            BreachFactory breachFactory = new BreachFactory();            
+            breachTypes = GetBreachTypesByComparingWithValue(value, limitsAsPerBreachType);
+            result = breachTypes.Find(x => x != "Normal");
+            result = result == null ? "Normal" : result;
+            return result;
+        }        
+        public static string ClassifyTemperatureBreach(string coolingType, double temperatureInC)
+        {
+            ICoolingType coolingTypeInstance = CreateCoolingTypeInstanceFromFactory(coolingType);
+            return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
+        }              
+        public static void CheckParameterAndAlert(string alertTarget, AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
+        {
+            string breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);            
+            IAlerter ialertDetails = CreateAlertTypeInstanceFromFactory(alertTarget);
+            ialertDetails.GenerateAlert(breachType);
+        }
+        private static IAlerter CreateAlertTypeInstanceFromFactory(string alertType)
+        {
+            AlertFactory alertFactory = new AlertFactory();
+            return alertFactory.GetInstanceOfAlertType(alertType);
+        }
+        private static ICoolingType CreateCoolingTypeInstanceFromFactory(string coolingType)
+        {
+            CoolingTypeFactory coolingTypeFactory = new CoolingTypeFactory();
+            return coolingTypeFactory.GetInstanceOfCoolingType(coolingType);
+        }
+        private static List<string> GetBreachTypesByComparingWithValue(double value, Dictionary<string, double> limitsAsPerBreachType)
+        {
+            
+            double limitValue = 0;
+            string breachTypeObjectName = string.Empty;            
+            List<Object> breachTypeObjects = new List<object>();
+            List<string> breachTypes = new List<string>();
+            BreachFactory breachFactory = new BreachFactory();
             breachTypeObjects = breachFactory.GetInstanceListOfBreachType();
             foreach (Object typeObject in breachTypeObjects)
             {
                 breachTypeObjectName = typeObject.ToString();
-                foreach (KeyValuePair<string, double>  breachLimit in limitsAsPerBreachType)
+                foreach (KeyValuePair<string, double> breachLimit in limitsAsPerBreachType)
                 {
                     if (breachLimit.Key == breachTypeObjectName.Split('.')[1])
                     {
@@ -28,28 +59,9 @@ namespace TypewiseAlert
                         break;
                     }
                 }
-                breachTypes.Add(new InferBreachParameter((IBreachType)typeObject).BreachLimit(value,limitValue));
+                breachTypes.Add(new InferBreachParameter((IBreachType)typeObject).BreachLimit(value, limitValue));
             }
-            result = breachTypes.Find(x => x != AlertConstants.BreachType.NORMAL);
-            return result;
+            return breachTypes;
         }
-        
-        public static AlertConstants.BreachType ClassifyTemperatureBreach(AlertConstants.CoolingType coolingType, double temperatureInC)
-        {
-            CoolingTypeFactory factory = new CoolingTypeFactory();
-            ICoolingType coolingTypeInstance = factory.GetInstanceOfCoolingType(coolingType.ToString());
-            return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
-        }
-              
-        public static void CheckParameterAndAlert(AlertConstants.AlertTarget alertTarget, AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
-        {
-            AlertConstants.BreachType breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
-            AlertFactory alertFactory = new AlertFactory();
-            string alertType = alertTarget.ToString().Split('_')[1].ToString().ToUpper();
-            IAlerter ialertDetails = alertFactory.GetInstanceOfAlertType(alertType);
-            ialertDetails.GenerateAlert(breachType);
-        }
-       
-
     }
 }

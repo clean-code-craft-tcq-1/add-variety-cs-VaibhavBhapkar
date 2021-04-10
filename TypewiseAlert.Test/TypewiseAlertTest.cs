@@ -1,3 +1,4 @@
+using Moq;
 using System;
 using Xunit;
 using static TypewiseAlert.AlertConstants;
@@ -6,58 +7,86 @@ namespace TypewiseAlert.Test
 {
     public class TypewiseAlertTest
     {
+        double value, lowerLimit, upperLimit,temperatureInC;
+        string actualBreachType,expectedBreachType,coolingType,alertType;
         [Fact]
-        public void InferBreachAsPerLowLimits()
+        public void InferBreach_ValueSmallerThanLowerLimit_Low()
         {
-            Assert.True(TypewiseAlert.InferBreach(12, 20, 30) ==
-              AlertConstants.BreachType.TOO_LOW);
+            value = 12;
+            lowerLimit = 20;
+            upperLimit = 30;
+            expectedBreachType = "Low";
+            actualBreachType = TypewiseAlert.InferBreach(value,lowerLimit,upperLimit);
+            Assert.True(actualBreachType == expectedBreachType);
         }
         [Fact]
-        public void InferBreachAsPerHighLimits()
+        public void InferBreach_ValueHigherThanUpperLimit_High()
         {
-            Assert.True(TypewiseAlert.InferBreach(35, 20, 30) ==
-              AlertConstants.BreachType.TOO_HIGH);
+            value = 35;
+            lowerLimit = 20;
+            upperLimit = 30;
+            expectedBreachType = "High";
+            actualBreachType = TypewiseAlert.InferBreach(value,lowerLimit,upperLimit);
+            Assert.True(actualBreachType == expectedBreachType);
         }
         [Fact]
-        public void InferBreachAsPerNormal()
+        public void InferBreach_ValueInSpecifiedRange_Normal()
         {
-            Assert.True(TypewiseAlert.InferBreach(25, 20, 30) ==
-              AlertConstants.BreachType.NORMAL);
+            value = 25;
+            lowerLimit = 20;
+            upperLimit = 30;
+            expectedBreachType = "Normal";
+            actualBreachType = TypewiseAlert.InferBreach(value, lowerLimit, upperLimit);
+            Assert.True(actualBreachType == expectedBreachType);
         }
         [Fact]
-        public void ClassifyTemperatureBreachLimitMediun()
+        public void ClassifyTemperatureBreachLimit_ValueComparingWithMediumCooling_High()
         {
-            Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.MED_ACTIVE_COOLING, 42) ==
-              AlertConstants.BreachType.TOO_HIGH);
+            coolingType = "MediumCooling";
+            temperatureInC = 42;
+            expectedBreachType = "High";
+            actualBreachType = TypewiseAlert.ClassifyTemperatureBreach(coolingType, temperatureInC);
+            Assert.True(actualBreachType == expectedBreachType);
         }
         [Fact]
-        public void ClassifyTemperatureBreachLimitHigh()
+        public void ClassifyTemperatureBreachLimit_ValueComparingWithHighCooling_Normal()
         {
-            Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.HI_ACTIVE_COOLING, 42) ==
-              AlertConstants.BreachType.NORMAL);
+            coolingType = "HighCooling";
+            temperatureInC = 42;
+            expectedBreachType = "Normal";
+            actualBreachType = TypewiseAlert.ClassifyTemperatureBreach(coolingType, temperatureInC);
+            Assert.True(actualBreachType == expectedBreachType);
         }
         [Fact]
-        public void ClassifyTemperatureBreachLimitLow()
+        public void ClassifyTemperatureBreachLimit_ValueComparingWithPassiveCooling_Low()
         {
-            Assert.True(TypewiseAlert.ClassifyTemperatureBreach(AlertConstants.CoolingType.PASSIVE_COOLING, -1) ==
-              AlertConstants.BreachType.TOO_LOW);
+            coolingType = "PassiveCooling";
+            temperatureInC = -1;
+            expectedBreachType = "Low";
+            actualBreachType = TypewiseAlert.ClassifyTemperatureBreach(coolingType, temperatureInC);
+            Assert.True(actualBreachType == expectedBreachType);
         }       
         [Fact]
-        public void CheckAlertTypeConsole()
+        public void CheckParameterAndAlert_GenerateEmailAlert_WithoutException()
         {
-            BatteryCharacter batteryCharacter = new BatteryCharacter(AlertConstants.CoolingType.MED_ACTIVE_COOLING, "Bosch");
-            var exception = Record.Exception(() => TypewiseAlert.CheckParameterAndAlert(AlertConstants.AlertTarget.TO_CONSOLE, batteryCharacter, 42));
+            BatteryCharacter batteryCharacter = new BatteryCharacter("MediumCooling", "Bosch");
+            alertType = "EmailAlert";
+            temperatureInC = 42;
+            var exception = Record.Exception(() => TypewiseAlert.CheckParameterAndAlert(alertType, batteryCharacter, temperatureInC));
             Assert.Null(exception);
         }
         
         [Fact]
-        public void CheckFakeAlert()
+        public void CheckParameterAndAlert_FakeEmailAlert_CalledAtLeastOnce()
         {
-            FakeAlert fakeAlert = new FakeAlert();
-            IAlerter generateTrigger = fakeAlert;
-            generateTrigger.GenerateAlert(AlertConstants.BreachType.TOO_HIGH);
-            IFakeAlertChecker fakeAlertChecker = fakeAlert;
-            Assert.True(fakeAlertChecker.IsAlertTriggered());
+            BatteryCharacter batteryCharacter = new BatteryCharacter("MediumCooling", "Bosch");
+            alertType = "FakeEmailAlert";
+            temperatureInC = 42;
+            var fakeAlertNotifier = new Mock<FakeEmailAlert>();
+            fakeAlertNotifier.Setup(x => x.GenerateAlert("High")).Verifiable();
+            var exception = Record.Exception(() => TypewiseAlert.CheckParameterAndAlert(alertType,batteryCharacter,temperatureInC));
+            Assert.Null(exception);
+            Assert.True(FakeEmailAlert.isGenerateAlertCalledOnce);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace TypewiseAlert
                 {
                     if (type.GetInterface(typeName) != null)
                     {
-                        if (type.Name.ToUpper().Contains(sourceName))
+                        if (type.Name.Contains(sourceName))
                         {
                             return type;
                         }
