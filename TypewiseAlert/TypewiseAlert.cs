@@ -1,90 +1,67 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TypewiseAlert
 {
-  public class TypewiseAlert
-  {
-    public enum BreachType {
-      NORMAL,
-      TOO_LOW,
-      TOO_HIGH
-    };
-    public static BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
-      if(value < lowerLimit) {
-        return BreachType.TOO_LOW;
-      }
-      if(value > upperLimit) {
-        return BreachType.TOO_HIGH;
-      }
-      return BreachType.NORMAL;
+    public class TypeWiseAlert
+    {
+        private IBreachObserver _iBreachObserver;
+        public TypeWiseAlert(IBreachObserver breachObserver)
+        {
+            _iBreachObserver = breachObserver;
+        }
+        public TypeWiseAlert() { }
+        public string InferBreach(double value, double lowerLimit, double upperLimit)
+        {
+            
+            string result = "Normal";            
+            List<string> breachTypes = new List<string>();
+            Dictionary<string, double> limitsAsPerBreachType = new Dictionary<string, double>();
+            limitsAsPerBreachType.Add("HighBreachType", upperLimit);
+            limitsAsPerBreachType.Add("LowBreachType", lowerLimit);
+            breachTypes = GetBreachTypesByComparingWithValue(value, limitsAsPerBreachType);
+            result = breachTypes.Find(x => x != "Normal");
+            result = result == null ? "Normal" : result;
+            return result;
+        }        
+        public string ClassifyTemperatureBreach(string coolingType, double temperatureInC)
+        {
+            ICoolingType coolingTypeInstance = CreateCoolingTypeInstanceFromFactory(coolingType);
+            return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
+        }              
+        public void CheckParameterAndAlert(AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
+        {
+            string breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);            
+            _iBreachObserver.GenerateAlert(breachType);
+        }
+        private ICoolingType CreateCoolingTypeInstanceFromFactory(string coolingType)
+        {
+            CoolingTypeFactory coolingTypeFactory = new CoolingTypeFactory();
+            return coolingTypeFactory.GetInstanceOfCoolingType(coolingType);
+        }
+        private List<string> GetBreachTypesByComparingWithValue(double value, Dictionary<string, double> limitsAsPerBreachType)
+        {
+            
+            double limitValue = 0;
+            string breachTypeObjectName = string.Empty;            
+            List<Object> breachTypeObjects = new List<object>();
+            List<string> breachTypes = new List<string>();
+            BreachFactory breachFactory = new BreachFactory();
+            breachTypeObjects = breachFactory.GetInstanceListOfBreachType();
+            foreach (Object typeObject in breachTypeObjects)
+            {
+                breachTypeObjectName = typeObject.ToString();
+                foreach (KeyValuePair<string, double> breachLimit in limitsAsPerBreachType)
+                {
+                    if (breachLimit.Key == breachTypeObjectName.Split('.')[1])
+                    {
+                        limitValue = breachLimit.Value;
+                        break;
+                    }
+                }
+                breachTypes.Add(new InferBreachParameter((IBreachType)typeObject).BreachLimit(value, limitValue));
+            }
+            return breachTypes;
+        }
     }
-    public enum CoolingType {
-      PASSIVE_COOLING,
-      HI_ACTIVE_COOLING,
-      MED_ACTIVE_COOLING
-    };
-    public static BreachType classifyTemperatureBreach(
-        CoolingType coolingType, double temperatureInC) {
-      int lowerLimit = 0;
-      int upperLimit = 0;
-      switch(coolingType) {
-        case CoolingType.PASSIVE_COOLING:
-          lowerLimit = 0;
-          upperLimit = 35;
-          break;
-        case CoolingType.HI_ACTIVE_COOLING:
-          lowerLimit = 0;
-          upperLimit = 45;
-          break;
-        case CoolingType.MED_ACTIVE_COOLING:
-          lowerLimit = 0;
-          upperLimit = 40;
-          break;
-      }
-      return inferBreach(temperatureInC, lowerLimit, upperLimit);
-    }
-    public enum AlertTarget{
-      TO_CONTROLLER,
-      TO_EMAIL
-    };
-    public struct BatteryCharacter {
-      public CoolingType coolingType;
-      public string brand;
-    }
-    public static void checkAndAlert(
-        AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
-
-      BreachType breachType = classifyTemperatureBreach(
-        batteryChar.coolingType, temperatureInC
-      );
-
-      switch(alertTarget) {
-        case AlertTarget.TO_CONTROLLER:
-          sendToController(breachType);
-          break;
-        case AlertTarget.TO_EMAIL:
-          sendToEmail(breachType);
-          break;
-      }
-    }
-    public static void sendToController(BreachType breachType) {
-      const ushort header = 0xfeed;
-      Console.WriteLine("{} : {}\n", header, breachType);
-    }
-    public static void sendToEmail(BreachType breachType) {
-      string recepient = "a.b@c.com";
-      switch(breachType) {
-        case BreachType.TOO_LOW:
-          Console.WriteLine("To: {}\n", recepient);
-          Console.WriteLine("Hi, the temperature is too low\n");
-          break;
-        case BreachType.TOO_HIGH:
-          Console.WriteLine("To: {}\n", recepient);
-          Console.WriteLine("Hi, the temperature is too high\n");
-          break;
-        case BreachType.NORMAL:
-          break;
-      }
-    }
-  }
 }
