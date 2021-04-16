@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public class FakeEmailAlert : IAlerter
+    public class FakeEmailAlert : IBreachObserver
     {
-        public static bool isGenerateAlertCalledOnce = false;
+        public bool isGenerateAlertCalledOnce = false;
         public virtual void GenerateAlert(string breachType)
         {
             Console.WriteLine("Fake Email Sent");

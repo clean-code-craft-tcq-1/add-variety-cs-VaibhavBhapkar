@@ -7,11 +7,11 @@ namespace TypewiseAlert
 {
     public class AlertFactory
     {
-        public IAlerter GetInstanceOfAlertType(string source)
+        public IBreachObserver GetInstanceOfAlertType(string source)
         {
-            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IAlerter).ToString());
+            Type typeAssembly = FindTypeInAssembly.FindInstanceOfAssembly(source,typeof(IBreachObserver).ToString());
             if (typeAssembly == null) throw new Exception("Bad Type");
-            else return Activator.CreateInstance(typeAssembly) as IAlerter;
+            else return Activator.CreateInstance(typeAssembly) as IBreachObserver;
         }
       
     }

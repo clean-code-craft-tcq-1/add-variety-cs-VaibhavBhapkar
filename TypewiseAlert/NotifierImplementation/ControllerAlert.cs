@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public class ControllerAlert : IAlerter
+    public class ControllerAlert : IBreachObserver
     {
         public void GenerateAlert(string breachType)
         {

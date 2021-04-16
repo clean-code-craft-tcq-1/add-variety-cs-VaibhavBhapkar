@@ -3,9 +3,15 @@ using System.Collections.Generic;
 
 namespace TypewiseAlert
 {
-    public class TypewiseAlert
-    {        
-        public static string InferBreach(double value, double lowerLimit, double upperLimit)
+    public class TypeWiseAlert
+    {
+        private IBreachObserver _iBreachObserver;
+        public TypeWiseAlert(IBreachObserver breachObserver)
+        {
+            _iBreachObserver = breachObserver;
+        }
+        public TypeWiseAlert() { }
+        public string InferBreach(double value, double lowerLimit, double upperLimit)
         {
             
             string result = "Normal";            
@@ -18,28 +24,22 @@ namespace TypewiseAlert
             result = result == null ? "Normal" : result;
             return result;
         }        
-        public static string ClassifyTemperatureBreach(string coolingType, double temperatureInC)
+        public string ClassifyTemperatureBreach(string coolingType, double temperatureInC)
         {
             ICoolingType coolingTypeInstance = CreateCoolingTypeInstanceFromFactory(coolingType);
             return InferBreach(temperatureInC, coolingTypeInstance.lowerLimit, coolingTypeInstance.upperLimit);
         }              
-        public static void CheckParameterAndAlert(string alertTarget, AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
+        public void CheckParameterAndAlert(AlertConstants.BatteryCharacter batteryChar, double temperatureInC)
         {
             string breachType = ClassifyTemperatureBreach(batteryChar.coolingType, temperatureInC);            
-            IAlerter ialertDetails = CreateAlertTypeInstanceFromFactory(alertTarget);
-            ialertDetails.GenerateAlert(breachType);
+            _iBreachObserver.GenerateAlert(breachType);
         }
-        private static IAlerter CreateAlertTypeInstanceFromFactory(string alertType)
-        {
-            AlertFactory alertFactory = new AlertFactory();
-            return alertFactory.GetInstanceOfAlertType(alertType);
-        }
-        private static ICoolingType CreateCoolingTypeInstanceFromFactory(string coolingType)
+        private ICoolingType CreateCoolingTypeInstanceFromFactory(string coolingType)
         {
             CoolingTypeFactory coolingTypeFactory = new CoolingTypeFactory();
             return coolingTypeFactory.GetInstanceOfCoolingType(coolingType);
         }
-        private static List<string> GetBreachTypesByComparingWithValue(double value, Dictionary<string, double> limitsAsPerBreachType)
+        private List<string> GetBreachTypesByComparingWithValue(double value, Dictionary<string, double> limitsAsPerBreachType)
         {
             
             double limitValue = 0;

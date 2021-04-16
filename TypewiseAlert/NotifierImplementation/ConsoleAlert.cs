@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypewiseAlert
 {
-    public class ConsoleAlert:IAlerter
+    public class ConsoleAlert:IBreachObserver
     {        
         public void GenerateAlert(string breachType)
         {
